@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Real-Time Chat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js" crossorigin="anonymous"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex flex-col h-screen">
+    <header class="bg-blue-600 text-white p-4 text-center text-2xl font-semibold">
+        Real-Time Chat
+    </header>
+    <main class="flex-grow p-4 flex flex-col max-w-3xl mx-auto">
+        <div id="chat" class="flex-grow overflow-y-auto mb-4 p-4 bg-white rounded shadow">
+            <!-- Messages will appear here -->
+        </div>
+        <form id="chat-form" class="flex">
+            <input id="message" type="text" placeholder="Type your message..." autocomplete="off" class="flex-grow p-2 rounded-l border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <button type="submit" class="bg-blue-600 text-white px-4 rounded-r hover:bg-blue-700 transition-colors">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </form>
+    </main>
+    <script>
+        const socket = io();
+
+        const chat = document.getElementById('chat');
+        const form = document.getElementById('chat-form');
+        const input = document.getElementById('message');
+
+        function appendMessage(msg) {
+            const div = document.createElement('div');
+            div.textContent = msg;
+            div.className = 'mb-2 p-2 bg-blue-100 rounded';
+            chat.appendChild(div);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        socket.on('message', function(msg) {
+            appendMessage(msg);
+        });
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (input.value.trim() !== '') {
+                socket.emit('message', input.value);
+                input.value = '';
+            }
+        });
+    </script>
+</body>
+</html>
